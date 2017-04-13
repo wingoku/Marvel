@@ -71,21 +71,34 @@ public class ComicListFragmentPresenter {
      */
     public void fetchComics(int limit, int offset, String apiKey, String md5Hash, String timeStamp) {
         Timber.d("Fetch Comics From Server");
-        MarvelAPI.Factory.getInstance(mNetworkComponent.getRetrofitInstance()).getComics(apiKey, md5Hash, timeStamp, limit, offset).enqueue(new Callback<MarvelResponse>() {
-            @Override
-            public void onResponse(Call<MarvelResponse> call, Response<MarvelResponse> response) {
-                if(response.body() == null || response.body().getData() == null || response.body().getData().getResults() == null) {
-                    comicsFetchingFailure(mFragment.getString(R.string.string_no_data_found_on_server));
-                    return;
-                }
-                comicsFetchingSuccess(response.body().getData().getResults());
-            }
+        MarvelAPI.Factory.getInstance(mNetworkComponent.getRetrofitInstance()).getComics(apiKey, md5Hash, timeStamp, limit, offset)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<MarvelResponse>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
 
-            @Override
-            public void onFailure(Call<MarvelResponse> call, Throwable t) {
-                comicsFetchingFailure(t.getLocalizedMessage());
-            }
-        });
+                    }
+
+                    @Override
+                    public void onNext(MarvelResponse response) {
+                        if(response == null || response.getData() == null || response.getData().getResults() == null) {
+                            comicsFetchingFailure(mFragment.getString(R.string.string_no_data_found_on_server));
+                            return;
+                        }
+                        comicsFetchingSuccess(response.getData().getResults());
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        comicsFetchingFailure(e.getLocalizedMessage());
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
     }
 
     /**

@@ -97,6 +97,9 @@ dependencies {
 
     // RX Android Lib
     compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
+    compile 'io.reactivex.rxjava2:rxjava:2.0.8'
+    compile 'com.squareup.retrofit2:adapter-rxjava2:2.2.0'
+
 
     // Timber Logging application
     compile 'com.jakewharton.timber:timber:4.5.1'

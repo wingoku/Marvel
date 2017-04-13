@@ -6,6 +6,7 @@ import dagger.Module;
 import dagger.Provides;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
@@ -17,9 +18,10 @@ public class RetrofitModule {
 
     @Provides
     @NetworkComponentScope
-    public Retrofit providesRetrofit(OkHttpClient okHttpClient, GsonConverterFactory gsonConverterFactory, String baseUrl) {
+    public Retrofit providesRetrofit(OkHttpClient okHttpClient, GsonConverterFactory gsonConverterFactory, RxJava2CallAdapterFactory rxJava2AdapterFactory, String baseUrl) {
         return new Retrofit.Builder()
                 .client(okHttpClient)
+                .addCallAdapterFactory(rxJava2AdapterFactory)
                 .addConverterFactory(gsonConverterFactory)
                 .baseUrl(baseUrl)
                 .build();
@@ -29,5 +31,11 @@ public class RetrofitModule {
     @NetworkComponentScope
     public GsonConverterFactory providesGsonConverterFactory() {
         return GsonConverterFactory.create();
+    }
+
+    @Provides
+    @NetworkComponentScope
+    public RxJava2CallAdapterFactory providesRxJava2AdapterFactory() {
+        return RxJava2CallAdapterFactory.create();
     }
 }

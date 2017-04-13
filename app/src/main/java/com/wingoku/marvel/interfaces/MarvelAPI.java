@@ -23,6 +23,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
+import io.reactivex.Observable;
 
 /**
  * Created by Umer on 4/9/2017.
@@ -35,7 +36,7 @@ public interface MarvelAPI {
     String BASE_URL = "http://gateway.marvel.com:80/v1/public/";
 
     @GET("comics")
-    Call<MarvelResponse> getComics(@Query("apikey") String apiKey, @Query("hash") String hash, @Query("ts") String timeStamp, @Query("limit") int limit, @Query("offset") int offset);
+    Observable<MarvelResponse> getComics(@Query("apikey") String apiKey, @Query("hash") String hash, @Query("ts") String timeStamp, @Query("limit") int limit, @Query("offset") int offset);
 
     class Factory {
         private static MarvelAPI mMarvelAPI;

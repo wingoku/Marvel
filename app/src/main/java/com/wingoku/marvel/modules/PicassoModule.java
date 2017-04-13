@@ -11,6 +11,7 @@ import com.wingoku.marvel.interfaces.qualifiers.PicassoLoggingInterceptor;
 import dagger.Module;
 import dagger.Provides;
 import okhttp3.OkHttpClient;
+import timber.log.Timber;
 
 /**
  * Created by Umer on 4/8/2017.
@@ -23,8 +24,6 @@ public class PicassoModule {
     public Picasso providesPicasso(Picasso.Builder picassoBuilder) {
         Picasso picasso = picassoBuilder.build();
         picasso.setLoggingEnabled(true);
-//        Picasso.setSingletonInstance(picasso);
-//        Picasso.with(getContext()).load(/*"http://image.tmdb.org/t/p/w300/sM33SANp9z6rXW8Itn7NnG1GOEs.jpg"*/marvelComic.getThumbnailUrl()+Constants.PORTAIT_INCREDIBLE).fetch();
         return picasso;
     }
 
@@ -35,7 +34,7 @@ public class PicassoModule {
                   .downloader(new OkHttp3Downloader(client)).listener(new Picasso.Listener() {
                         @Override
                         public void onImageLoadFailed(Picasso picasso, Uri uri, Exception exception) {
-                            Log.e("wingoki", "failure: "+ exception.getLocalizedMessage());
+                            Timber.e("Picasso Image Load Failure: %s", exception.getLocalizedMessage());
                         }
                   });
     }

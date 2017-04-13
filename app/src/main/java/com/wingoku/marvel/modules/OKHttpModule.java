@@ -30,7 +30,6 @@ import okhttp3.logging.HttpLoggingInterceptor;
 @Module (includes = ContextModule.class)
 public class OKHttpModule {
 
-    private static final String HTTP_CACHE_PATH = "http-cache";
     private static final String CACHE_CONTROL = "Cache-Control";
     private static final String PRAGMA = "Pragma";
 
