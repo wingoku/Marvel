@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:fitsSystemWindows="true">
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/app_bar_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fitsSystemWindows="true"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+        <android.support.design.widget.CollapsingToolbarLayout
+            android:id="@+id/collapsing_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fitsSystemWindows="true"
+            app:contentScrim="?attr/colorPrimary"
+            app:expandedTitleMarginEnd="@dimen/collapsing_toolbar_title_margin_end"
+            app:expandedTitleMarginStart="@dimen/collapsing_toolbar_title_margin_start"
+            app:expandedTitleTextAppearance="@style/CollapsedAppBarTextAppearance"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed">
+
+            <ImageView
+                android:id="@+id/image"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fitsSystemWindows="true"
+                android:scaleType="fitXY"
+                android:src="@drawable/marvel_logo"
+                app:layout_collapseMode="parallax" />
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:minHeight="?android:attr/actionBarSize"
+                app:layout_collapseMode="pin">
+
+                <LinearLayout
+                    android:id="@+id/layout_toolbar_pageCount"
+                    android:layout_gravity="end"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:visibility="invisible"
+                    >
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_pages"/>
+
+                <TextView
+                    android:id="@+id/tv_toolbarPageCount"
+                    android:layout_gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin_left_toolbar_page_count_text_view"
+                    android:layout_marginEnd="@dimen/margin_right_toolbar_page_count_text_view"
+                    android:layout_marginRight="@dimen/margin_right_toolbar_page_count_text_view"
+                    android:layout_marginLeft="@dimen/margin_left_toolbar_page_count_text_view"
+                    android:textSize="@dimen/dimen_comic_list_fragment_toolbar_text_size"
+                    android:textColor="@color/toolbar_items_color"
+                    tools:text="5555" />
+                </LinearLayout>
+            </android.support.v7.widget.Toolbar>
+
+        </android.support.design.widget.CollapsingToolbarLayout>
+    </android.support.design.widget.AppBarLayout>
+
+    <com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="@dimen/width_circle_progress_bar"
+        android:layout_height="@dimen/height_circle_progress_bar"
+        android:visibility="gone"
+        app:mlpb_progress_color="@color/colorPrimary"
+        android:layout_gravity="center"/>
+
+    <!-- RECYCLER VIEW FOR DISPLAYING COMICS CARD GRID-->
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/list_comics"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/background_color"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+</android.support.design.widget.CoordinatorLayout>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/fragment_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+</FrameLayout>
+
+<!-- REASON FOR USING COORIDNATOR LAYOUT INSTEAD OF USING FRAMELAYOUT IN THIS LAYOUT FILE
+ http://stackoverflow.com/a/34345286/1250107-->

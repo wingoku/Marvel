@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="comic_card_width">160dp</dimen>
+    <dimen name="comic_image_view_width">160dp</dimen>
+    <dimen name="comic_image_view_height">215dp</dimen>
+    <integer name="comic_grid_columns">4</integer>
+</resources>

@@ -1,0 +1,122 @@
+buildscript {
+    repositories {
+        maven { url 'https://maven.fabric.io/public' }
+    }
+
+    dependencies {
+        // These docs use an open ended version so that our plugin
+        // can be updated quickly in response to Android tooling updates
+
+        // We recommend changing it to the latest version from our changelog:
+        // https://docs.fabric.io/android/changelog.html#fabric-gradle-plugin
+        classpath 'io.fabric.tools:gradle:1.+'
+    }
+}
+
+def versionNumber = "25.1.0"
+
+apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
+apply plugin: 'com.jakewharton.butterknife'
+apply plugin: 'realm-android'
+
+repositories {
+    maven { url 'https://maven.fabric.io/public' }
+}
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion '25.0.0'
+    defaultConfig {
+        applicationId "com.wingoku.marvel"
+        minSdkVersion 16
+        targetSdkVersion 25
+        versionCode 1
+        versionName "1.0"
+        multiDexEnabled true
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    packagingOptions {
+        exclude 'META-INF/rxjava.properties'
+    }
+
+    // reason: http://stackoverflow.com/a/37390580/1250107
+    configurations.all {
+        resolutionStrategy.force 'com.android.support:support-annotations:'+versionNumber
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+
+    /* NOTE: There is a weird bug IN WHICH THE TOOLBAR TEXTVIEW OF THE
+    Collapsing TOOLBAR IS MISPLACED WHEN FRAGMENT A WIH CONTRACTED COLLAPSING TOOLBAR OPENS A FRAGMENT B. FRAGMENT B CHANGES ORIENTATION
+    TO LANDSCAPE AND CONTRACTS THE COLLAPSING TOOLBAR. WHEN FRAGMENT B EXITS, THE COLLAPSING TOOLBAR TEXTVIEW OF FRAGMENT A GETS MISPLACED
+    */
+
+    // Android support libaries
+    compile 'com.android.support:appcompat-v7:'+versionNumber
+    compile 'com.android.support.constraint:constraint-layout:1.0.0-alpha9'
+
+    compile 'com.android.support:cardview-v7:'+versionNumber
+    compile 'com.android.support:design:'+versionNumber
+    compile ('com.android.support:recyclerview-v7:'+versionNumber) {
+        exclude module: 'support-v4'
+    }
+
+    // View dependency injection library by Jake Wharton
+    compile 'com.jakewharton:butterknife:8.5.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
+
+    // Library foe managing RESTful APIs
+    compile 'com.squareup.retrofit2:retrofit:2.2.0'
+    compile 'com.squareup.retrofit2:converter-gson:2.2.0'
+    compile "com.squareup.retrofit2:adapter-rxjava:2.2.0"
+    compile 'com.squareup.okhttp3:logging-interceptor:3.6.0'
+
+    // image caching library
+    compile 'com.squareup.picasso:picasso:2.5.2'
+    compile 'com.jakewharton.picasso:picasso2-okhttp3-downloader:1.1.0'
+
+    // eventBus library for relaying events among classes
+    compile 'org.greenrobot:eventbus:3.0.0'
+
+    // Crash reporting SDK
+    compile('com.crashlytics.sdk.android:crashlytics:2.6.7@aar') {
+        transitive = true;
+    }
+
+    compile('com.lsjwzh:materialloadingprogressbar:0.5.8-RELEASE')
+
+    // RX Android Lib
+    compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
+
+    // Timber Logging application
+    compile 'com.jakewharton.timber:timber:4.5.1'
+
+    // apt command comes from the android-apt plugin
+    compile 'com.google.dagger:dagger:2.9'
+    annotationProcessor "com.google.dagger:dagger-compiler:2.9"
+    provided 'javax.annotation:jsr250-api:1.0'
+
+    // TEST FRAMEWORKS
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+
+    androidTestCompile('com.android.support.test.espresso:espresso-contrib:2.0') {
+        exclude group: 'com.android.support', module: 'appcompat'
+        exclude group: 'com.android.support', module: 'support-v4'
+        exclude module: 'recyclerview-v7'
+        exclude group: 'com.android.support', module: 'support-annotations'
+    }
+
+    compile 'com.android.support.test.espresso:espresso-idling-resource:2.2.2'
+}
