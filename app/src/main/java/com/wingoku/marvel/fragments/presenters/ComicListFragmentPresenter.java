@@ -93,10 +93,7 @@ public class ComicListFragmentPresenter {
      * @param localizedMessage ERROR MESSAGE
      */
     private void comicsFetchingFailure(String localizedMessage) {
-        if(mFragment != null) {
-//            mFragment.onComicsFetchingFailed(localizedMessage);
-            EventBus.getDefault().post(new OnComicsFetchFailureEvent(localizedMessage));
-        }
+        EventBus.getDefault().post(new OnComicsFetchFailureEvent(localizedMessage));
     }
 
     /**
@@ -104,10 +101,7 @@ public class ComicListFragmentPresenter {
      * @param marvelResults list containing {@link Result}
      */
     private void comicsFetchingSuccess(List<Result> marvelResults) {
-        if(mFragment != null) {
-//            mFragment.onComicsFetchedSuccessfully(marvelResults);
-            EventBus.getDefault().post(new OnComicsFetchSuccessEvent(marvelResults));
-        }
+        EventBus.getDefault().post(new OnComicsFetchSuccessEvent(marvelResults));
     }
 
     /**

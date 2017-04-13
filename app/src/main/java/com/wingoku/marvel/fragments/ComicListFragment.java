@@ -52,7 +52,7 @@ import timber.log.Timber;
 import static com.wingoku.marvel.utils.Constants.MAX_NUMBER_OF_COMICS_TO_FETCH;
 
 /**
- * Created by Umer on 3/6/2017.
+ * Created by Umer on 4/8/2017.
  */
 
 public class ComicListFragment extends Fragment {
@@ -138,12 +138,6 @@ public class ComicListFragment extends Fragment {
             updateComicAdapter(mComicListFragmentPresenter.getMarvelComicsListSize());
         }
 
-        // onActivityCreated will be called whenever this fragment returns from pause state meaning onActivityCreated will
-        // be called if the activity/fragment is destroyed or this fragment is replaced. Since Android doesn't recreated the
-        // replaced fragment instead it simply uses the same old instance of the fragment, it means the fragment will have all the data
-        // in its member objects in case it was replaced by another fragment. So instead of making the Network call for fetching
-        // data again that's probably in the mMarvelComics object, we check if this object contains data that it previously fetched form
-        // the server, if yes, then we don't make the network call
         if(mComicListFragmentPresenter.getMarvelComicsListSize() == 0 && !mNetworkRequestEnqueue) {
             initiateComicFetchingCall();
         }
@@ -172,7 +166,6 @@ public class ComicListFragment extends Fragment {
         populateRecyclerViewAdapter(mComicListFragmentPresenter.getMarvelComicsList());
         addScrollListenerToRecyclerView();
 
-        mToolbarPageCountTV.setText("hello world");
         return mView;
     }
 

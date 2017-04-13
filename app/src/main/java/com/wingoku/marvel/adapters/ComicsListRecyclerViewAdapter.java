@@ -26,7 +26,7 @@ import butterknife.ButterKnife;
 import timber.log.Timber;
 
 /**
- * Created by Umer on 3/6/2017.
+ * Created by Umer on 4/9/2017.
  */
 
 public class ComicsListRecyclerViewAdapter extends RecyclerView.Adapter<ComicsListRecyclerViewAdapter.ComicsListRecyclerViewHolder>{

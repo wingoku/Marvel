@@ -14,7 +14,7 @@ import io.realm.annotations.PrimaryKey;
 import timber.log.Timber;
 
 /**
- * Created by Umer on 4/5/2017.
+ * Created by Umer on 4/9/2017.
  */
 
 public class MarvelComic extends RealmObject implements Parcelable {

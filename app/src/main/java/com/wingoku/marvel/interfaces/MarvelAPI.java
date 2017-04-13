@@ -25,7 +25,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Query;
 
 /**
- * Created by Umer on 4/5/2017.
+ * Created by Umer on 4/9/2017.
  */
 
 public interface MarvelAPI {

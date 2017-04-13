@@ -22,7 +22,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
- * Created by Umer on 3/7/2017.
+ * Created by Umer on 4/8/2017.
  */
 
 public class ComicDetailFragment extends Fragment{
