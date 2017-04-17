@@ -1,6 +1,6 @@
 package com.wingoku.marvel.modules;
 
-import com.wingoku.marvel.interfaces.qualifiers.NetworkComponentScope;
+import com.wingoku.marvel.interfaces.qualifiers.ComicListPresenterComponentScope;
 
 import dagger.Module;
 import dagger.Provides;
@@ -17,7 +17,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class RetrofitModule {
 
     @Provides
-    @NetworkComponentScope
+    @ComicListPresenterComponentScope
     public Retrofit providesRetrofit(OkHttpClient okHttpClient, GsonConverterFactory gsonConverterFactory, RxJava2CallAdapterFactory rxJava2AdapterFactory, String baseUrl) {
         return new Retrofit.Builder()
                 .client(okHttpClient)
@@ -28,13 +28,13 @@ public class RetrofitModule {
     }
 
     @Provides
-    @NetworkComponentScope
+    @ComicListPresenterComponentScope
     public GsonConverterFactory providesGsonConverterFactory() {
         return GsonConverterFactory.create();
     }
 
     @Provides
-    @NetworkComponentScope
+    @ComicListPresenterComponentScope
     public RxJava2CallAdapterFactory providesRxJava2AdapterFactory() {
         return RxJava2CallAdapterFactory.create();
     }

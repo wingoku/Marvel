@@ -3,7 +3,7 @@ package com.wingoku.marvel.modules;
 import android.content.Context;
 
 import com.wingoku.marvel.BuildConfig;
-import com.wingoku.marvel.interfaces.qualifiers.NetworkComponentScope;
+import com.wingoku.marvel.interfaces.qualifiers.ComicListPresenterComponentScope;
 import com.wingoku.marvel.interfaces.qualifiers.PicassoLoggingInterceptor;
 import com.wingoku.marvel.utils.Utils;
 
@@ -34,7 +34,7 @@ public class OKHttpModule {
     private static final String PRAGMA = "Pragma";
 
     @Provides
-    @NetworkComponentScope
+    @ComicListPresenterComponentScope
     public OkHttpClient providesOkHttpClient(final Context context, OkHttpClient.Builder builder, HttpLoggingInterceptor okhttpLoggingInterceptor, Cache cache, @Named("RewriteResponseInterceptor") Interceptor rewriteResponseInterceptor, @Named("RewriteResponseOfflineInterceptor") Interceptor rewriteResponseOfflineInterceptor) {
         builder.cache(cache);
         builder.addInterceptor(new Interceptor() {
@@ -98,7 +98,7 @@ public class OKHttpModule {
     }
 
     @Provides
-    @NetworkComponentScope
+    @ComicListPresenterComponentScope
     @PicassoLoggingInterceptor
     public OkHttpClient providesOkHttpClientForPicasso(OkHttpClient.Builder builder, HttpLoggingInterceptor okhttpLoggingInterceptor) {
         if(BuildConfig.DEBUG) {
@@ -117,7 +117,7 @@ public class OKHttpModule {
     }
 
     @Provides
-    @NetworkComponentScope
+    @ComicListPresenterComponentScope
     public Cache providesCache(Context context) {
         File httpCacheDirectory = new File(context.getCacheDir(), "marvel_responses");
         int cacheSize = 100 * 1024 * 1024; // 100 MB

@@ -1,16 +1,8 @@
 package com.wingoku.marvel.database;
 
-import android.app.Application;
-import android.os.Handler;
-import android.os.Looper;
-import android.support.annotation.MainThread;
-import android.support.v4.app.Fragment;
-import android.util.Log;
-
 import com.wingoku.marvel.models.MarvelComic;
 import com.wingoku.marvel.utils.Utils;
 
-import java.util.Calendar;
 import java.util.List;
 
 import io.realm.Realm;
@@ -21,21 +13,13 @@ import timber.log.Timber;
  * Created by Umer on 4/11/2017.
  */
 
-public class ComicsDBController {
-    private static ComicsDBController instance;
+public class ComicsCacheDBController {
     private final Realm realm;
 
-    public ComicsDBController () {
+    public ComicsCacheDBController() {
         realm = Realm.getDefaultInstance();
     }
-
-    public static ComicsDBController getInstance() {
-        if (instance == null) {
-            instance = new ComicsDBController();
-        }
-        return instance;
-    }
-
+    
     public Realm getRealm() {
         return realm;
     }

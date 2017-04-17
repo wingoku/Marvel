@@ -1,14 +1,11 @@
 package com.wingoku.marvel.fragments;
 
 import android.os.Bundle;
-import android.os.Handler;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -37,7 +34,7 @@ import com.wingoku.marvel.eventbus.OnMarvelComicListCreationFailureEvent;
 import com.wingoku.marvel.fragments.presenters.ComicListFragmentPresenter;
 import com.wingoku.marvel.models.MarvelComic;
 import com.wingoku.marvel.models.MarvelComics;
-import com.wingoku.marvel.models.serverResponse.Result;
+import com.wingoku.marvel.modules.ContextModule;
 import com.wingoku.marvel.utils.Constants;
 import com.wingoku.marvel.utils.Utils;
 
@@ -45,6 +42,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import timber.log.Timber;
@@ -92,6 +90,7 @@ public class ComicListFragment extends Fragment {
     private ComicsListRecyclerViewAdapter mAdapter;
     private ComicListFragmentPresenter mComicListFragmentPresenter;
 
+
     /**
      * COMIC LIST FRAGMENT ONSAVEDINSTANCE KEYS
      */
@@ -105,8 +104,7 @@ public class ComicListFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mComicListFragmentPresenter = new ComicListFragmentPresenter();
-        mComicListFragmentPresenter.init(this);
+        mComicListFragmentPresenter = new ComicListFragmentPresenter(this);
     }
 
     @Override
@@ -263,7 +261,7 @@ public class ComicListFragment extends Fragment {
     }
 
     private void initiateComicFetchingCall() {
-        if(mNumberOfFetchedComics < MAX_NUMBER_OF_COMICS_TO_FETCH && !mNetworkRequestEnqueue /*&& !onFragmentRecreated*/ && !isBudgetModeActive) {
+        if(mNumberOfFetchedComics < MAX_NUMBER_OF_COMICS_TO_FETCH && !mNetworkRequestEnqueue && !isBudgetModeActive) {
             mProgressBar.setVisibility(View.VISIBLE);
             mNetworkRequestEnqueue = true;
             if(getMainActivity() != null) {

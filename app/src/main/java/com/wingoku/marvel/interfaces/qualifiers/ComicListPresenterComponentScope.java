@@ -11,5 +11,5 @@ import javax.inject.Scope;
 
 @Scope
 @Retention(RetentionPolicy.CLASS)
-public @interface NetworkComponentScope {
+public @interface ComicListPresenterComponentScope {
 }

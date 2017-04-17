@@ -2,7 +2,7 @@ package com.wingoku.marvel.fragments.presenters;
 
 import com.squareup.picasso.Picasso;
 import com.wingoku.marvel.R;
-import com.wingoku.marvel.database.ComicsDBController;
+import com.wingoku.marvel.database.ComicsCacheDBController;
 import com.wingoku.marvel.eventbus.OnComicsFetchFailureEvent;
 import com.wingoku.marvel.eventbus.OnComicsFetchSuccessEvent;
 import com.wingoku.marvel.eventbus.OnComicsFilterTaskCompleteEvent;
@@ -11,8 +11,9 @@ import com.wingoku.marvel.eventbus.OnMarvelComicListCreationCompleteEvent;
 import com.wingoku.marvel.eventbus.OnMarvelComicListCreationFailureEvent;
 import com.wingoku.marvel.fragments.ComicListFragment;
 import com.wingoku.marvel.interfaces.MarvelAPI;
-import com.wingoku.marvel.interfaces.components.DaggerNetworkComponent;
-import com.wingoku.marvel.interfaces.components.NetworkComponent;
+
+import com.wingoku.marvel.interfaces.components.ComicListPresenterComponent;
+import com.wingoku.marvel.interfaces.components.DaggerComicListPresenterComponent;
 import com.wingoku.marvel.models.MarvelComic;
 import com.wingoku.marvel.models.MarvelComics;
 import com.wingoku.marvel.models.serverResponse.Item;
@@ -26,16 +27,18 @@ import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import retrofit2.Retrofit;
 import timber.log.Timber;
 
 /**
@@ -45,20 +48,34 @@ import timber.log.Timber;
 public class ComicListFragmentPresenter {
 
     private MarvelComics mMarvelComics;
-    private NetworkComponent mNetworkComponent;
+    private ComicListPresenterComponent mComicListPresenterComponent;
     private ComicListFragment mFragment;
 
+    @Inject
+    ComicsCacheDBController mComicsCacheDBController;
+
+    @Inject
+    Retrofit mRetrofit;
+
+    @Inject
+    Picasso mPicasso;
+
     /**
-     * Initialize {@link ComicListFragmentPresenter}
+     * Instantiate {@link ComicListFragmentPresenter}
      * @param fragment {@link ComicListFragment} instance
      */
-    public void init(ComicListFragment fragment) {
+    public ComicListFragmentPresenter (ComicListFragment fragment) {
         // Building dagger DI component
-        mNetworkComponent = DaggerNetworkComponent.builder().contextModule(new ContextModule(fragment.getContext())).build();
+        mComicListPresenterComponent = DaggerComicListPresenterComponent
+                                        .builder()
+                                        .contextModule(new ContextModule(fragment.getContext()))
+                                        .build();
+        mComicListPresenterComponent.inject(this);
+
         mMarvelComics = new MarvelComics();
         mFragment = fragment;
 
-        ComicsDBController.getInstance().validateExpiryDateForDBEntry(Constants.MAX_STALE_DAYS);
+        mComicsCacheDBController.validateExpiryDateForDBEntry(Constants.MAX_STALE_DAYS);
     }
 
     /**
@@ -71,7 +88,7 @@ public class ComicListFragmentPresenter {
      */
     public void fetchComics(int limit, int offset, String apiKey, String md5Hash, String timeStamp) {
         Timber.d("Fetch Comics From Server");
-        MarvelAPI.Factory.getInstance(mNetworkComponent.getRetrofitInstance()).getComics(apiKey, md5Hash, timeStamp, limit, offset)
+        MarvelAPI.Factory.getInstance(mRetrofit).getComics(apiKey, md5Hash, timeStamp, limit, offset)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<MarvelResponse>() {
@@ -122,6 +139,8 @@ public class ComicListFragmentPresenter {
      * @param marvelResults list of {@link Result} fetching server
      */
     public void createComicListFromServerResponse(final List<Result> marvelResults) {
+
+
         Observable<MarvelComic> marvelObservable2 = Observable.create(new ObservableOnSubscribe<MarvelComic>() {
             @Override
             public void subscribe(ObservableEmitter<MarvelComic> e) throws Exception {
@@ -161,7 +180,7 @@ public class ComicListFragmentPresenter {
                     public void onNext(MarvelComic comic) {
                         Timber.d("createComicListFromServerResponse()::onNext");
                         getMarvelComicsList().add(comic);
-                        ComicsDBController.getInstance().insertComic(comic);
+                        mComicsCacheDBController.insertComic(comic);
                     }
 
                     @Override
@@ -266,7 +285,7 @@ public class ComicListFragmentPresenter {
      * @return Picasso instance
      */
     public Picasso getPicassoInstance() {
-        return mNetworkComponent.getPicassoInstance();
+        return mPicasso;
     }
 
     /**
@@ -274,6 +293,6 @@ public class ComicListFragmentPresenter {
      * @return List<MarvelComic></>
      */
     public List<MarvelComic> getCachedMarvelComicsFromDB() {
-        return ComicsDBController.getInstance().getRealm().copyFromRealm(ComicsDBController.getInstance().getAllComics());
+        return mComicsCacheDBController.getRealm().copyFromRealm(mComicsCacheDBController.getAllComics());
     }
 }

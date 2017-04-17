@@ -21,6 +21,8 @@ import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import timber.log.Timber;
@@ -36,7 +38,8 @@ public class ComicsListRecyclerViewAdapter extends RecyclerView.Adapter<ComicsLi
     private int mListSize;
 
     private List<MarvelComic> mMarvelComicList;
-    private Picasso mPicasso;
+
+    Picasso mPicasso;
 
     /**
      * {@link ComicsListRecyclerViewAdapter} constructor
