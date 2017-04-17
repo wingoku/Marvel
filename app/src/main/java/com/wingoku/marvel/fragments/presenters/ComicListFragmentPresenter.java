@@ -139,36 +139,30 @@ public class ComicListFragmentPresenter {
      * @param marvelResults list of {@link Result} fetching server
      */
     public void createComicListFromServerResponse(final List<Result> marvelResults) {
-
-
-        Observable<MarvelComic> marvelObservable2 = Observable.create(new ObservableOnSubscribe<MarvelComic>() {
+        Observable<MarvelComic> marvelObservable = Observable.fromIterable(marvelResults).map(new Function<Result, MarvelComic>() {
             @Override
-            public void subscribe(ObservableEmitter<MarvelComic> e) throws Exception {
-                for(Result result : marvelResults) {
-                    MarvelComic marvelComic = new MarvelComic();
-                    Timber.d("Comics DB Entry Date: %s", marvelComic.getDBEntryDate());
-                    marvelComic.setDescription(result.getDescription());
-                    marvelComic.setTitle(result.getTitle());
-                    marvelComic.setPageCount(result.getPageCount());
-                    marvelComic.setThumbnailUrl(result.getThumbnail().getPath());
-                    marvelComic.setId(result.getId());
-                    List<Item> itemList = result.getCreators().getItems();
-                    if(itemList != null && itemList.size() > 0) {
-                        marvelComic.setAuthor(itemList.get(0).getName());
-                    }
-
-                    List<Price> priceList = result.getPrices();
-                    if(priceList != null && priceList.size() > 0) {
-                        marvelComic.setPrice(priceList.get(0).getPrice());
-                    }
-
-                    e.onNext(marvelComic);
+            public MarvelComic apply(@NonNull Result result) throws Exception {
+                MarvelComic marvelComic = new MarvelComic();
+                Timber.d("Comics DB Entry Date: %s", marvelComic.getDBEntryDate());
+                marvelComic.setDescription(result.getDescription());
+                marvelComic.setTitle(result.getTitle());
+                marvelComic.setPageCount(result.getPageCount());
+                marvelComic.setThumbnailUrl(result.getThumbnail().getPath());
+                marvelComic.setId(result.getId());
+                List<Item> itemList = result.getCreators().getItems();
+                if(itemList != null && itemList.size() > 0) {
+                    marvelComic.setAuthor(itemList.get(0).getName());
                 }
-                e.onComplete();
+
+                List<Price> priceList = result.getPrices();
+                if(priceList != null && priceList.size() > 0) {
+                    marvelComic.setPrice(priceList.get(0).getPrice());
+                }
+                return marvelComic;
             }
         });
 
-        marvelObservable2.subscribeOn(Schedulers.io())
+        marvelObservable.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<MarvelComic>() {
 

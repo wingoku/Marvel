@@ -19,7 +19,7 @@ public class ComicsCacheDBController {
     public ComicsCacheDBController() {
         realm = Realm.getDefaultInstance();
     }
-    
+
     public Realm getRealm() {
         return realm;
     }
