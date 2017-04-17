@@ -25,18 +25,18 @@ import com.wingoku.marvel.utils.Constants;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.util.HashMap;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
+import io.reactivex.functions.Predicate;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.Retrofit;
 import timber.log.Timber;
@@ -196,44 +196,43 @@ public class ComicListFragmentPresenter {
      * @param budget budget amount
      */
     public void filterComicsAccordingToBudget(final double budget) {
-        Timber.d("filterComicsAccordingToBudget()");
-        Observable<Integer> filterObservable = Observable.create(new ObservableOnSubscribe<Integer>() {
-            @Override
-            public void subscribe(ObservableEmitter<Integer> e) throws Exception {
-                Timber.d("filterComicsAccordingToBudget():subscribe");
-                int pageCountOfComicsWithInBudget = 0;
-                double totalCost = 0.0;
-                for(MarvelComic comic : getMarvelComicsList()) {
-                    totalCost += Double.valueOf(comic.getPrice());
-                    Timber.d("totalCost: %s budget: %s priceOfComic: %s", totalCost, budget, comic.getPrice());
-                    if(totalCost > budget) {
-                        break;
+        final String PRICE = "price";
+        final String PAGE_COUNT = "pageCount";
+        final String COMICS_COUNT = "comicsCount";
+        Observable.fromIterable(getMarvelComicsList())
+                .map(new Function<MarvelComic, HashMap<String, Double>>() {
+                    HashMap<String, Double> myMap = new HashMap<String, Double>();
+                    double count = 0;
+                    @Override
+                    public HashMap<String, Double> apply(@NonNull MarvelComic marvelComic) throws Exception {
+                        myMap.put(PRICE, Double.valueOf(marvelComic.getPrice()));
+                        myMap.put(PAGE_COUNT, Double.valueOf(marvelComic.getPageCount()));
+                        myMap.put(COMICS_COUNT, count++);
+                        return myMap;
                     }
-
-                    pageCountOfComicsWithInBudget += Integer.valueOf(comic.getPageCount());
-                    Timber.d("pageCount: %s price: %s comicName: %s totalPages: %s", comic.getPageCount(), comic.getPrice(), comic.getTitle(), pageCountOfComicsWithInBudget);
-                    e.onNext(pageCountOfComicsWithInBudget);
-                }
-                e.onComplete();
-            }
-        });
-
-        filterObservable.subscribeOn(Schedulers.computation())
+                })
+                .takeWhile(new Predicate<HashMap<String, Double>>() {
+                    double sum;
+                    @Override
+                    public boolean test(@NonNull HashMap<String, Double> map) throws Exception {
+                        return (sum+=map.get(PRICE)) < budget;
+                    }
+                })
+                .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<Integer>() {
-                    int comicCount = 0;
-                    int pageCountOfComicsWithInBudget = 0;
-
+                .subscribe(new Observer<HashMap<String, Double>>() {
+                    double count = 0;
+                    double pageCount = 0;
                     @Override
                     public void onSubscribe(Disposable d) {
-                        Timber.d("filterComicsAccordingToBudget():onSubscribe");
+
                     }
 
                     @Override
-                    public void onNext(Integer pageCountOfComicsWithInBudget) {
+                    public void onNext(HashMap<String, Double> map) {
                         Timber.d("filterComicsAccordingToBudget():onNext");
-                        comicCount++;
-                        this.pageCountOfComicsWithInBudget = pageCountOfComicsWithInBudget;
+                        pageCount = map.get(PAGE_COUNT);
+                        count = map.get(COMICS_COUNT);
                     }
 
                     @Override
@@ -245,7 +244,7 @@ public class ComicListFragmentPresenter {
                     @Override
                     public void onComplete() {
                         Timber.d("filterComicsAccordingToBudget():onComplete");
-                        EventBus.getDefault().post(new OnComicsFilterTaskCompleteEvent(comicCount, pageCountOfComicsWithInBudget));
+                        EventBus.getDefault().post(new OnComicsFilterTaskCompleteEvent((int)count, (int)pageCount));
                     }
                 });
     }
