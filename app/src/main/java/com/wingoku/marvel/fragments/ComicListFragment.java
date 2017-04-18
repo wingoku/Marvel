@@ -213,6 +213,8 @@ public class ComicListFragment extends Fragment {
         if(getMainActivity() != null) {
             getMainActivity().onNetworkProcessEnded();
         }
+        // dispose off all the active observables
+        mComicListFragmentPresenter.disposeOffObservables();
         super.onDestroyView();
     }
 

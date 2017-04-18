@@ -34,9 +34,11 @@ import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
+import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.Retrofit;
 import timber.log.Timber;
@@ -50,6 +52,7 @@ public class ComicListFragmentPresenter {
     private MarvelComics mMarvelComics;
     private ComicListPresenterComponent mComicListPresenterComponent;
     private ComicListFragment mFragment;
+    private CompositeDisposable mCompositeDisposable;
 
     @Inject
     ComicsCacheDBController mComicsCacheDBController;
@@ -74,6 +77,7 @@ public class ComicListFragmentPresenter {
 
         mMarvelComics = new MarvelComics();
         mFragment = fragment;
+        mCompositeDisposable = new CompositeDisposable();
 
         mComicsCacheDBController.validateExpiryDateForDBEntry(Constants.MAX_STALE_DAYS);
     }
@@ -88,15 +92,10 @@ public class ComicListFragmentPresenter {
      */
     public void fetchComics(int limit, int offset, String apiKey, String md5Hash, String timeStamp) {
         Timber.d("Fetch Comics From Server");
-        MarvelAPI.Factory.getInstance(mRetrofit).getComics(apiKey, md5Hash, timeStamp, limit, offset)
+        Disposable marvelNetworkDisposable = MarvelAPI.Factory.getInstance(mRetrofit).getComics(apiKey, md5Hash, timeStamp, limit, offset)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<MarvelResponse>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
-
-                    }
-
+                .subscribeWith(new DisposableObserver<MarvelResponse>() {
                     @Override
                     public void onNext(MarvelResponse response) {
                         if(response == null || response.getData() == null || response.getData().getResults() == null) {
@@ -116,6 +115,7 @@ public class ComicListFragmentPresenter {
 
                     }
                 });
+        mCompositeDisposable.add(marvelNetworkDisposable);
     }
 
     /**
@@ -139,37 +139,32 @@ public class ComicListFragmentPresenter {
      * @param marvelResults list of {@link Result} fetching server
      */
     public void createComicListFromServerResponse(final List<Result> marvelResults) {
-        Observable<MarvelComic> marvelObservable = Observable.fromIterable(marvelResults).map(new Function<Result, MarvelComic>() {
-            @Override
-            public MarvelComic apply(@NonNull Result result) throws Exception {
-                MarvelComic marvelComic = new MarvelComic();
-                Timber.d("Comics DB Entry Date: %s", marvelComic.getDBEntryDate());
-                marvelComic.setDescription(result.getDescription());
-                marvelComic.setTitle(result.getTitle());
-                marvelComic.setPageCount(result.getPageCount());
-                marvelComic.setThumbnailUrl(result.getThumbnail().getPath());
-                marvelComic.setId(result.getId());
-                List<Item> itemList = result.getCreators().getItems();
-                if(itemList != null && itemList.size() > 0) {
-                    marvelComic.setAuthor(itemList.get(0).getName());
-                }
-
-                List<Price> priceList = result.getPrices();
-                if(priceList != null && priceList.size() > 0) {
-                    marvelComic.setPrice(priceList.get(0).getPrice());
-                }
-                return marvelComic;
-            }
-        });
-
-        marvelObservable.subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<MarvelComic>() {
-
+        Disposable createMarvelComicsListDisposable = Observable.fromIterable(marvelResults)
+                .map(new Function<Result, MarvelComic>() {
                     @Override
-                    public void onSubscribe(Disposable d) {
-                    }
+                    public MarvelComic apply(@NonNull Result result) throws Exception {
+                        MarvelComic marvelComic = new MarvelComic();
+                        Timber.d("Comics DB Entry Date: %s", marvelComic.getDBEntryDate());
+                        marvelComic.setDescription(result.getDescription());
+                        marvelComic.setTitle(result.getTitle());
+                        marvelComic.setPageCount(result.getPageCount());
+                        marvelComic.setThumbnailUrl(result.getThumbnail().getPath());
+                        marvelComic.setId(result.getId());
+                        List<Item> itemList = result.getCreators().getItems();
+                        if (itemList != null && itemList.size() > 0) {
+                            marvelComic.setAuthor(itemList.get(0).getName());
+                        }
 
+                        List<Price> priceList = result.getPrices();
+                        if (priceList != null && priceList.size() > 0) {
+                            marvelComic.setPrice(priceList.get(0).getPrice());
+                        }
+                        return marvelComic;
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new DisposableObserver<MarvelComic>() {
                     @Override
                     public void onNext(MarvelComic comic) {
                         Timber.d("createComicListFromServerResponse()::onNext");
@@ -189,6 +184,8 @@ public class ComicListFragmentPresenter {
                         EventBus.getDefault().post(new OnMarvelComicListCreationCompleteEvent());
                     }
                 });
+
+        mCompositeDisposable.add(createMarvelComicsListDisposable);
     }
 
     /**
@@ -199,7 +196,7 @@ public class ComicListFragmentPresenter {
         final String PRICE = "price";
         final String PAGE_COUNT = "pageCount";
         final String COMICS_COUNT = "comicsCount";
-        Observable.fromIterable(getMarvelComicsList())
+        Disposable filterDisposable = Observable.fromIterable(getMarvelComicsList())
                 .map(new Function<MarvelComic, HashMap<String, Double>>() {
                     HashMap<String, Double> myMap = new HashMap<String, Double>();
                     double count = 0;
@@ -220,13 +217,9 @@ public class ComicListFragmentPresenter {
                 })
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<HashMap<String, Double>>() {
+                .subscribeWith(new DisposableObserver<HashMap<String, Double>>() {
                     double count = 0;
                     double pageCount = 0;
-                    @Override
-                    public void onSubscribe(Disposable d) {
-
-                    }
 
                     @Override
                     public void onNext(HashMap<String, Double> map) {
@@ -247,6 +240,8 @@ public class ComicListFragmentPresenter {
                         EventBus.getDefault().post(new OnComicsFilterTaskCompleteEvent((int)count, (int)pageCount));
                     }
                 });
+
+        mCompositeDisposable.add(filterDisposable);
     }
 
     /**
@@ -287,5 +282,13 @@ public class ComicListFragmentPresenter {
      */
     public List<MarvelComic> getCachedMarvelComicsFromDB() {
         return mComicsCacheDBController.getRealm().copyFromRealm(mComicsCacheDBController.getAllComics());
+    }
+
+    /**
+     * Disposes off all the observables that are current active.
+     * Must call this method upon configuration/orientation change!
+     */
+    public void disposeOffObservables() {
+        mCompositeDisposable.dispose();
     }
 }
