@@ -1,7 +1,7 @@
 package com.wingoku.marvel.modules;
 
 import com.wingoku.marvel.interfaces.MarvelAPI;
-import com.wingoku.marvel.interfaces.qualifiers.ComicListPresenterComponentScope;
+import com.wingoku.marvel.interfaces.qualifiers.PerFragment;
 
 import dagger.Module;
 import dagger.Provides;
@@ -13,7 +13,7 @@ import dagger.Provides;
 public class RetrofitBaseUrlModule {
 
     @Provides
-    @ComicListPresenterComponentScope
+    @PerFragment
     public String providesMarvelAPIUrl() {
         return MarvelAPI.BASE_URL;
     }

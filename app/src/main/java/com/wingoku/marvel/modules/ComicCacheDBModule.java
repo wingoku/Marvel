@@ -1,7 +1,7 @@
 package com.wingoku.marvel.modules;
 
 import com.wingoku.marvel.database.ComicsCacheDBController;
-import com.wingoku.marvel.interfaces.qualifiers.ComicListPresenterComponentScope;
+import com.wingoku.marvel.interfaces.qualifiers.PerFragment;
 
 import dagger.Module;
 import dagger.Provides;
@@ -15,7 +15,7 @@ import timber.log.Timber;
 public class ComicCacheDBModule {
 
     @Provides
-    @ComicListPresenterComponentScope
+    @PerFragment
     public ComicsCacheDBController providesComicsDBController() {
         Timber.e("proviesComicsDBController()");
         return new ComicsCacheDBController();

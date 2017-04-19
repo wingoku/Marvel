@@ -5,7 +5,7 @@ import android.net.Uri;
 
 import com.jakewharton.picasso.OkHttp3Downloader;
 import com.squareup.picasso.Picasso;
-import com.wingoku.marvel.interfaces.qualifiers.ComicListPresenterComponentScope;
+import com.wingoku.marvel.interfaces.qualifiers.PerFragment;
 import com.wingoku.marvel.interfaces.qualifiers.PicassoLoggingInterceptor;
 import dagger.Module;
 import dagger.Provides;
@@ -19,7 +19,7 @@ import timber.log.Timber;
 @Module(includes = OKHttpModule.class)
 public class PicassoModule {
     @Provides
-    @ComicListPresenterComponentScope
+    @PerFragment
     public Picasso providesPicasso(Picasso.Builder picassoBuilder) {
         Picasso picasso = picassoBuilder.build();
         picasso.setLoggingEnabled(true);
@@ -27,7 +27,7 @@ public class PicassoModule {
     }
 
     @Provides
-    @ComicListPresenterComponentScope
+    @PerFragment
     public Picasso.Builder providesPicassoBuilder(Context context, @PicassoLoggingInterceptor OkHttpClient client) {
         return new Picasso.Builder(context)
                   .downloader(new OkHttp3Downloader(client)).listener(new Picasso.Listener() {
