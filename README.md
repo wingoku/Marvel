@@ -4,6 +4,7 @@ Java Docs: https://wingoku.github.io/marvelandroid/index.html
 
 More on Dagger2 Scoping: http://stackoverflow.com/a/30984952/1250107
 
+```
 Copyright (C) 2017 WinGoku
 Copyright (C) 2011 Android Open Source Project
 
@@ -18,3 +19,4 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
+```
