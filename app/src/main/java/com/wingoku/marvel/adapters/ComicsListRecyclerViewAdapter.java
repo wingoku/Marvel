@@ -25,7 +25,10 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import timber.log.Timber;
+
+import static android.R.attr.onClick;
 
 /**
  * Created by Umer on 4/9/2017.
@@ -79,7 +82,7 @@ public class ComicsListRecyclerViewAdapter extends RecyclerView.Adapter<ComicsLi
         return mListSize;
     }
 
-    static class ComicsListRecyclerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    static class ComicsListRecyclerViewHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.imageView_comicPic)
         ImageView mComicThumbnailImageView;
@@ -96,12 +99,10 @@ public class ComicsListRecyclerViewAdapter extends RecyclerView.Adapter<ComicsLi
         public ComicsListRecyclerViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
-            mCardView.setOnClickListener(this);
-            // in case the user taps on image, we should be able to recieve that click event
-            mComicThumbnailImageView.setOnClickListener(this);
         }
 
-        @Override
+        // in case the user taps on image, we should be able to recieve that click event
+        @OnClick({R.id.card_view, R.id.imageView_comicPic})
         public void onClick(View v) {
             /**
              * The event bus will relay this event to {@link com.wingoku.marvel.fragments.ComicListFragment} that will in turn send this to MainActivity

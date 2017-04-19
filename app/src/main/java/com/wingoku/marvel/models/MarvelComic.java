@@ -30,7 +30,7 @@ public class MarvelComic extends RealmObject implements Parcelable {
 
     public MarvelComic() {
         mDBEntryDate = Utils.getDate(0);
-        Timber.e("date is: %s", mDBEntryDate);
+        Timber.d("date is: %s", mDBEntryDate);
     }
 
     public void setDBEntryDate(String date) {

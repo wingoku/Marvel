@@ -198,14 +198,14 @@ public class ComicListFragmentPresenter {
         final String COMICS_COUNT = "comicsCount";
         Disposable filterDisposable = Observable.fromIterable(getMarvelComicsList())
                 .map(new Function<MarvelComic, HashMap<String, Double>>() {
-                    HashMap<String, Double> myMap = new HashMap<String, Double>();
+                    HashMap<String, Double> filterComicDataMap = new HashMap<String, Double>();
                     double count = 0;
                     @Override
                     public HashMap<String, Double> apply(@NonNull MarvelComic marvelComic) throws Exception {
-                        myMap.put(PRICE, Double.valueOf(marvelComic.getPrice()));
-                        myMap.put(PAGE_COUNT, Double.valueOf(marvelComic.getPageCount()));
-                        myMap.put(COMICS_COUNT, count++);
-                        return myMap;
+                        filterComicDataMap.put(PRICE, Double.valueOf(marvelComic.getPrice()));
+                        filterComicDataMap.put(PAGE_COUNT, Double.valueOf(marvelComic.getPageCount()));
+                        filterComicDataMap.put(COMICS_COUNT, count++);
+                        return filterComicDataMap;
                     }
                 })
                 .takeWhile(new Predicate<HashMap<String, Double>>() {
@@ -285,10 +285,16 @@ public class ComicListFragmentPresenter {
     }
 
     /**
-     * Disposes off all the observables that are current active.
+     * Clears off all the observables that are current active.
      * Must call this method upon configuration/orientation change!
+     *  READ MORE ABOUT THE DIFFERENCE BETWEEN CLEAR & DISPOSE on RxJava website
+     *
+     *   Using clear will clear all, but can accept new disposable
+            disposables.clear();
+         Using dispose will clear all and set isDisposed = true, so it will not accept any new disposable
+            disposables.dispose();
      */
-    public void disposeOffObservables() {
-        mCompositeDisposable.dispose();
+    public void clearOffObservables() {
+        mCompositeDisposable.clear();
     }
 }

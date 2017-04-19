@@ -34,7 +34,6 @@ import com.wingoku.marvel.eventbus.OnMarvelComicListCreationFailureEvent;
 import com.wingoku.marvel.fragments.presenters.ComicListFragmentPresenter;
 import com.wingoku.marvel.models.MarvelComic;
 import com.wingoku.marvel.models.MarvelComics;
-import com.wingoku.marvel.modules.ContextModule;
 import com.wingoku.marvel.utils.Constants;
 import com.wingoku.marvel.utils.Utils;
 
@@ -200,21 +199,16 @@ public class ComicListFragment extends Fragment {
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-        mAdapter = null;
-        mView = null;
-    }
-
-    @Override
     public void onDestroyView() {
+        Timber.e("onDestroyView");
         // unregister event bus
         EventBus.getDefault().unregister(this);
         if(getMainActivity() != null) {
             getMainActivity().onNetworkProcessEnded();
         }
-        // dispose off all the active observables
-        mComicListFragmentPresenter.disposeOffObservables();
+        // clear off all the active observables
+        mComicListFragmentPresenter.clearOffObservables();
+        mNetworkRequestEnqueue = false;
         super.onDestroyView();
     }
 
