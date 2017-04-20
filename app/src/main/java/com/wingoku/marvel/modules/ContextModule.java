@@ -2,6 +2,8 @@ package com.wingoku.marvel.modules;
 
 import android.content.Context;
 
+import com.wingoku.marvel.fragments.ComicListFragment;
+
 import dagger.Module;
 import dagger.Provides;
 

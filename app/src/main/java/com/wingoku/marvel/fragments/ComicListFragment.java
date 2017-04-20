@@ -32,8 +32,12 @@ import com.wingoku.marvel.eventbus.OnComicsFilterTaskFailureEvent;
 import com.wingoku.marvel.eventbus.OnMarvelComicListCreationCompleteEvent;
 import com.wingoku.marvel.eventbus.OnMarvelComicListCreationFailureEvent;
 import com.wingoku.marvel.fragments.presenters.ComicListFragmentPresenter;
+import com.wingoku.marvel.interfaces.components.ComicListFragmentComponent;
+import com.wingoku.marvel.interfaces.components.DaggerComicListFragmentComponent;
 import com.wingoku.marvel.models.MarvelComic;
 import com.wingoku.marvel.models.MarvelComics;
+import com.wingoku.marvel.modules.ComicListFragmentModule;
+import com.wingoku.marvel.modules.ContextModule;
 import com.wingoku.marvel.utils.Constants;
 import com.wingoku.marvel.utils.Utils;
 
@@ -41,6 +45,8 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.util.List;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -87,7 +93,11 @@ public class ComicListFragment extends Fragment {
     private boolean isAppbarExpanded;
     private boolean isBudgetModeActive;
     private ComicsListRecyclerViewAdapter mAdapter;
-    private ComicListFragmentPresenter mComicListFragmentPresenter;
+
+    @Inject
+    ComicListFragmentPresenter mComicListFragmentPresenter;
+
+    private ComicListFragmentComponent mComicListFragmentComponent;
 
 
     /**
@@ -103,7 +113,13 @@ public class ComicListFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mComicListFragmentPresenter = new ComicListFragmentPresenter(this);
+//        mComicListFragmentPresenter = new ComicListFragmentPresenter(this);
+        mComicListFragmentComponent = DaggerComicListFragmentComponent
+                .builder()
+                .contextModule(new ContextModule(getContext()))
+                .comicListFragmentModule(new ComicListFragmentModule(this))
+                .build();
+        mComicListFragmentComponent.inject(this);
     }
 
     @Override

@@ -12,15 +12,12 @@ import com.wingoku.marvel.eventbus.OnMarvelComicListCreationFailureEvent;
 import com.wingoku.marvel.fragments.ComicListFragment;
 import com.wingoku.marvel.interfaces.MarvelAPI;
 
-import com.wingoku.marvel.interfaces.components.ComicListPresenterComponent;
-import com.wingoku.marvel.interfaces.components.DaggerComicListPresenterComponent;
 import com.wingoku.marvel.models.MarvelComic;
 import com.wingoku.marvel.models.MarvelComics;
 import com.wingoku.marvel.models.serverResponse.Item;
 import com.wingoku.marvel.models.serverResponse.MarvelResponse;
 import com.wingoku.marvel.models.serverResponse.Price;
 import com.wingoku.marvel.models.serverResponse.Result;
-import com.wingoku.marvel.modules.ContextModule;
 import com.wingoku.marvel.utils.Constants;
 
 import org.greenrobot.eventbus.EventBus;
@@ -31,7 +28,6 @@ import java.util.List;
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
-import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.CompositeDisposable;
@@ -50,30 +46,29 @@ import timber.log.Timber;
 public class ComicListFragmentPresenter {
 
     private MarvelComics mMarvelComics;
-    private ComicListPresenterComponent mComicListPresenterComponent;
     private ComicListFragment mFragment;
     private CompositeDisposable mCompositeDisposable;
 
-    @Inject
+//    @Inject
     ComicsCacheDBController mComicsCacheDBController;
 
-    @Inject
+//    @Inject
     Retrofit mRetrofit;
 
-    @Inject
+//    @Inject
     Picasso mPicasso;
 
     /**
      * Instantiate {@link ComicListFragmentPresenter}
      * @param fragment {@link ComicListFragment} instance
      */
-    public ComicListFragmentPresenter (ComicListFragment fragment) {
+    @Inject
+    public ComicListFragmentPresenter (ComicListFragment fragment, Retrofit retrofit, Picasso picasso, ComicsCacheDBController comicsCacheDBController) {
         // Building dagger DI component
-        mComicListPresenterComponent = DaggerComicListPresenterComponent
-                                        .builder()
-                                        .contextModule(new ContextModule(fragment.getContext()))
-                                        .build();
-        mComicListPresenterComponent.inject(this);
+
+        mRetrofit = retrofit;
+        mPicasso = picasso;
+        mComicsCacheDBController = comicsCacheDBController;
 
         mMarvelComics = new MarvelComics();
         mFragment = fragment;
