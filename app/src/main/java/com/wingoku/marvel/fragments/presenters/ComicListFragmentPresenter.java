@@ -1,5 +1,7 @@
 package com.wingoku.marvel.fragments.presenters;
 
+import android.content.Context;
+
 import com.squareup.picasso.Picasso;
 import com.wingoku.marvel.R;
 import com.wingoku.marvel.database.ComicsCacheDBController;
@@ -46,32 +48,28 @@ import timber.log.Timber;
 public class ComicListFragmentPresenter {
 
     private MarvelComics mMarvelComics;
-    private ComicListFragment mFragment;
     private CompositeDisposable mCompositeDisposable;
 
-//    @Inject
     ComicsCacheDBController mComicsCacheDBController;
-
-//    @Inject
     Retrofit mRetrofit;
-
-//    @Inject
     Picasso mPicasso;
+    Context mContext;
 
     /**
-     * Instantiate {@link ComicListFragmentPresenter}
-     * @param fragment {@link ComicListFragment} instance
+     *
+     * @param context Context of activity or prefereably context of the application
+     * @param retrofit instance of retrofit
+     * @param picasso instance of picasso
+     * @param comicsCacheDBController instance of comicsCacheDB
      */
-    @Inject
-    public ComicListFragmentPresenter (ComicListFragment fragment, Retrofit retrofit, Picasso picasso, ComicsCacheDBController comicsCacheDBController) {
-        // Building dagger DI component
-
+    @Inject //This is called constructor injection
+    public ComicListFragmentPresenter (Context context, Retrofit retrofit, Picasso picasso, ComicsCacheDBController comicsCacheDBController) {
+        mContext = context;
         mRetrofit = retrofit;
         mPicasso = picasso;
         mComicsCacheDBController = comicsCacheDBController;
 
         mMarvelComics = new MarvelComics();
-        mFragment = fragment;
         mCompositeDisposable = new CompositeDisposable();
 
         mComicsCacheDBController.validateExpiryDateForDBEntry(Constants.MAX_STALE_DAYS);
@@ -94,7 +92,7 @@ public class ComicListFragmentPresenter {
                     @Override
                     public void onNext(MarvelResponse response) {
                         if(response == null || response.getData() == null || response.getData().getResults() == null) {
-                            comicsFetchingFailure(mFragment.getString(R.string.string_no_data_found_on_server));
+                            comicsFetchingFailure(mContext.getString(R.string.string_no_data_found_on_server));
                             return;
                         }
                         comicsFetchingSuccess(response.getData().getResults());

@@ -36,7 +36,6 @@ import com.wingoku.marvel.interfaces.components.ComicListFragmentComponent;
 import com.wingoku.marvel.interfaces.components.DaggerComicListFragmentComponent;
 import com.wingoku.marvel.models.MarvelComic;
 import com.wingoku.marvel.models.MarvelComics;
-import com.wingoku.marvel.modules.ComicListFragmentModule;
 import com.wingoku.marvel.modules.ContextModule;
 import com.wingoku.marvel.utils.Constants;
 import com.wingoku.marvel.utils.Utils;
@@ -94,6 +93,9 @@ public class ComicListFragment extends Fragment {
     private boolean isBudgetModeActive;
     private ComicsListRecyclerViewAdapter mAdapter;
 
+    // this will tell Dagger to call ComicListFragmentPresenter constructor to inject dependencies. NOTE that
+    // the ComicListFragmentPresetner class must have a constructor with all the required dependencies as arguments
+    // & the constructor must be annotated with @Inject. This is called constructor injection
     @Inject
     ComicListFragmentPresenter mComicListFragmentPresenter;
 
@@ -113,11 +115,10 @@ public class ComicListFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        mComicListFragmentPresenter = new ComicListFragmentPresenter(this);
+        // Building dagger DI component
         mComicListFragmentComponent = DaggerComicListFragmentComponent
                 .builder()
                 .contextModule(new ContextModule(getContext()))
-                .comicListFragmentModule(new ComicListFragmentModule(this))
                 .build();
         mComicListFragmentComponent.inject(this);
     }
