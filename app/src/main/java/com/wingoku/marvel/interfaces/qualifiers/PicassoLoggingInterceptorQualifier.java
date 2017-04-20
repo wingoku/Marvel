@@ -9,5 +9,5 @@ import javax.inject.Scope;
  */
 
 @Qualifier
-public @interface PicassoLoggingInterceptor {
+public @interface PicassoLoggingInterceptorQualifier {
 }
