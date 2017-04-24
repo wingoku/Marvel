@@ -20,6 +20,8 @@ import org.greenrobot.eventbus.Subscribe;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.fabric.sdk.android.Fabric;
+import rx.functions.Action1;
+import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -105,6 +107,26 @@ public class MainActivity extends AppCompatActivity {
      */
     public CountingIdlingResource getEspressoIdlingResourceForMainActivity() {
         return mEspressoTestIdlingResource;
+    }
+
+    private void exampleForUsingRxEventBus() {
+        /**
+         * NOTE:
+         *  Currently I'm not using RxBus instead of using EventBus because of the clutter that new Action1<DataType>() {}
+         *   will make for all the methods that are tagged with @Subscribe annotation.
+         *
+         *   RxBus can be used even now but I'm not using it just for cosmetic reasons. However if I start using
+         *   lambdas using RetroLambda lib, the new Action1(DataType){} will be reduced to single statement, which
+         *   will be EXTREMLY clean solution.
+         *   I'll switch to using RetroLamda with Rxjava in the near future.
+         */
+        RxBus.getInstance().register(String.class,
+                new Action1<String>() {
+                    @Override
+                    public void call(String string) {
+                        Timber.e("rxBus onAction() called with value %s", string);
+                    }
+                });
     }
 
     @Subscribe

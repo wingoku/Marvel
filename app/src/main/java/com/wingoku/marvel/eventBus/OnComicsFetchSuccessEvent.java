@@ -1,6 +1,5 @@
-package com.wingoku.marvel.eventbus;
+package com.wingoku.marvel.eventBus;
 
-import com.wingoku.marvel.R;
 import com.wingoku.marvel.models.serverResponse.Result;
 
 import java.util.List;

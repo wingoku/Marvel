@@ -1,7 +1,6 @@
 package com.wingoku.marvel.application;
 
 import android.app.Application;
-import android.os.Build;
 
 import com.wingoku.marvel.BuildConfig;
 
@@ -14,6 +13,7 @@ import timber.log.Timber;
  */
 
 public class ComicApplication extends Application {
+
     @Override
     public void onCreate() {
         super.onCreate();

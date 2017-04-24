@@ -3,17 +3,15 @@ package com.wingoku.marvel.adapters;
 import android.content.Context;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 import com.wingoku.marvel.R;
-import com.wingoku.marvel.eventbus.OnComicListCardClickedEvent;
+import com.wingoku.marvel.eventBus.OnComicListCardClickedEvent;
 import com.wingoku.marvel.models.MarvelComic;
 import com.wingoku.marvel.utils.Constants;
 
@@ -21,14 +19,9 @@ import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import timber.log.Timber;
-
-import static android.R.attr.onClick;
 
 /**
  * Created by Umer on 4/9/2017.
@@ -82,7 +75,7 @@ public class ComicsListRecyclerViewAdapter extends RecyclerView.Adapter<ComicsLi
         return mListSize;
     }
 
-    static class ComicsListRecyclerViewHolder extends RecyclerView.ViewHolder {
+    class ComicsListRecyclerViewHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.imageView_comicPic)
         ImageView mComicThumbnailImageView;

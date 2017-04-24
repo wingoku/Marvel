@@ -1,4 +1,4 @@
-package com.wingoku.marvel.eventbus;
+package com.wingoku.marvel.eventBus;
 
 /**
  * Created by Umer on 4/13/2017.

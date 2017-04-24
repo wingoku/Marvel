@@ -5,13 +5,12 @@ import android.content.Context;
 import com.squareup.picasso.Picasso;
 import com.wingoku.marvel.R;
 import com.wingoku.marvel.database.ComicsCacheDBController;
-import com.wingoku.marvel.eventbus.OnComicsFetchFailureEvent;
-import com.wingoku.marvel.eventbus.OnComicsFetchSuccessEvent;
-import com.wingoku.marvel.eventbus.OnComicsFilterTaskCompleteEvent;
-import com.wingoku.marvel.eventbus.OnComicsFilterTaskFailureEvent;
-import com.wingoku.marvel.eventbus.OnMarvelComicListCreationCompleteEvent;
-import com.wingoku.marvel.eventbus.OnMarvelComicListCreationFailureEvent;
-import com.wingoku.marvel.fragments.ComicListFragment;
+import com.wingoku.marvel.eventBus.OnComicsFetchFailureEvent;
+import com.wingoku.marvel.eventBus.OnComicsFetchSuccessEvent;
+import com.wingoku.marvel.eventBus.OnComicsFilterTaskCompleteEvent;
+import com.wingoku.marvel.eventBus.OnComicsFilterTaskFailureEvent;
+import com.wingoku.marvel.eventBus.OnMarvelComicListCreationCompleteEvent;
+import com.wingoku.marvel.eventBus.OnMarvelComicListCreationFailureEvent;
 import com.wingoku.marvel.interfaces.MarvelAPI;
 
 import com.wingoku.marvel.models.MarvelComic;
@@ -50,10 +49,10 @@ public class ComicListFragmentPresenter {
     private MarvelComics mMarvelComics;
     private CompositeDisposable mCompositeDisposable;
 
-    ComicsCacheDBController mComicsCacheDBController;
-    Retrofit mRetrofit;
-    Picasso mPicasso;
-    Context mContext;
+    private ComicsCacheDBController mComicsCacheDBController;
+    private Retrofit mRetrofit;
+    private Picasso mPicasso;
+    private Context mContext;
 
     /**
      *
