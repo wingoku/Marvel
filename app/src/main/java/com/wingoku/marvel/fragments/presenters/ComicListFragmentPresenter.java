@@ -15,6 +15,7 @@ import com.wingoku.marvel.interfaces.MarvelAPI;
 
 import com.wingoku.marvel.models.MarvelComic;
 import com.wingoku.marvel.models.MarvelComics;
+import com.wingoku.marvel.models.rxjava.FilterComicsModel;
 import com.wingoku.marvel.models.serverResponse.Item;
 import com.wingoku.marvel.models.serverResponse.MarvelResponse;
 import com.wingoku.marvel.models.serverResponse.Price;
@@ -22,6 +23,7 @@ import com.wingoku.marvel.models.serverResponse.Result;
 import com.wingoku.marvel.utils.Constants;
 
 import org.greenrobot.eventbus.EventBus;
+
 
 import java.util.HashMap;
 import java.util.List;
@@ -33,6 +35,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 import io.reactivex.observers.DisposableObserver;
@@ -185,53 +188,61 @@ public class ComicListFragmentPresenter {
      * @param budget budget amount
      */
     public void filterComicsAccordingToBudget(final double budget) {
-        final String PRICE = "price";
-        final String PAGE_COUNT = "pageCount";
-        final String COMICS_COUNT = "comicsCount";
         Disposable filterDisposable = Observable.fromIterable(getMarvelComicsList())
-                .map(new Function<MarvelComic, HashMap<String, Double>>() {
-                    HashMap<String, Double> filterComicDataMap = new HashMap<String, Double>();
-                    double count = 0;
+                .map(new Function<MarvelComic, FilterComicsModel>() {
                     @Override
-                    public HashMap<String, Double> apply(@NonNull MarvelComic marvelComic) throws Exception {
-                        filterComicDataMap.put(PRICE, Double.valueOf(marvelComic.getPrice()));
-                        filterComicDataMap.put(PAGE_COUNT, Double.valueOf(marvelComic.getPageCount()));
-                        filterComicDataMap.put(COMICS_COUNT, count++);
-                        return filterComicDataMap;
+                    public FilterComicsModel apply(MarvelComic marvelComic){
+                        Timber.e("map()");
+                        FilterComicsModel filterComicsModel = new FilterComicsModel();
+                        filterComicsModel.setPrice(Double.valueOf(marvelComic.getPrice()));
+                        filterComicsModel.setPageCount(Integer.valueOf(marvelComic.getPageCount()));
+                        filterComicsModel.setComicCount(1);
+                        return filterComicsModel;
                     }
                 })
-                .takeWhile(new Predicate<HashMap<String, Double>>() {
-                    double sum;
+                .scan(new BiFunction<FilterComicsModel, FilterComicsModel, FilterComicsModel>() {
                     @Override
-                    public boolean test(@NonNull HashMap<String, Double> map) throws Exception {
-                        return (sum+=map.get(PRICE)) < budget;
+                    public FilterComicsModel apply(FilterComicsModel previousDataModel, FilterComicsModel newDataModel) throws Exception {
+                        Timber.e("scan()");
+                        Timber.e("inputPageCount: %s  newValuePageCount: %s", previousDataModel.getPageCount(), newDataModel.getPageCount());
+                        FilterComicsModel filterComicsModel = new FilterComicsModel();
+                        filterComicsModel.setPrice(previousDataModel.getPrice()+newDataModel.getPrice());
+                        filterComicsModel.setPageCount(previousDataModel.getPageCount()+newDataModel.getPageCount());
+                        filterComicsModel.setComicCount(previousDataModel.getComicCount()+newDataModel.getComicCount());
+                        return filterComicsModel;
                     }
                 })
-                .subscribeOn(Schedulers.computation())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new DisposableObserver<HashMap<String, Double>>() {
-                    double count = 0;
-                    double pageCount = 0;
-
+                .takeWhile(new Predicate<FilterComicsModel>() {
                     @Override
-                    public void onNext(HashMap<String, Double> map) {
-                        Timber.d("filterComicsAccordingToBudget():onNext");
-                        pageCount = map.get(PAGE_COUNT);
-                        count = map.get(COMICS_COUNT);
+                    public boolean test(@NonNull FilterComicsModel filterData) throws Exception {
+                        Timber.e("takeWhile()");
+                        return filterData.getPrice() < budget;
+                    }
+                })
+                .subscribeWith(new DisposableObserver<FilterComicsModel>() {
+                    int count = 0;
+                    int pageCount = 0;
+                    @Override
+                    public void onNext(FilterComicsModel filteredData) {
+                        Timber.e("onNext()");
+                        count = filteredData.getComicCount();
+                        pageCount = filteredData.getPageCount();
+                        Timber.e("sum %s  pageCount %s  ComicCount: %s", filteredData.getPrice(), filteredData.getPageCount(), filteredData.getComicCount());
                     }
 
                     @Override
                     public void onError(Throwable e) {
-                        Timber.e("onFilterComicsForBudget:onError() %s", e);
+                        e.printStackTrace();
                         EventBus.getDefault().post(new OnComicsFilterTaskFailureEvent(e.getLocalizedMessage()));
                     }
 
                     @Override
                     public void onComplete() {
-                        Timber.d("filterComicsAccordingToBudget():onComplete");
-                        EventBus.getDefault().post(new OnComicsFilterTaskCompleteEvent((int)count, (int)pageCount));
+                        Timber.e("onComplete");
+                        EventBus.getDefault().post(new OnComicsFilterTaskCompleteEvent(count, pageCount));
                     }
                 });
+
 
         mCompositeDisposable.add(filterDisposable);
     }
@@ -288,5 +299,98 @@ public class ComicListFragmentPresenter {
      */
     public void clearOffObservables() {
         mCompositeDisposable.clear();
+    }
+
+    // alternative way to perform filter
+    private void retroLambda(final double budget) {
+        Observable.fromIterable(getMarvelComicsList()).
+                map(new Function<MarvelComic, HashMap<String, Double>>() {
+                    @Override
+                    public HashMap<String, Double> apply(@NonNull MarvelComic marvelComic) {
+                        HashMap<String, Double> map = new HashMap<String, Double>();
+                        map.put("price", Double.valueOf(marvelComic.getPrice()));
+                        map.put("pageCount", Double.valueOf(marvelComic.getPageCount()));
+                        map.put("comicCount", Double.valueOf(marvelComic.getPageCount()));
+                        return map;
+                    }
+                })
+                .scan(new BiFunction<HashMap<String, Double>,
+                                HashMap<String, Double>, HashMap<String, Double>>() {
+                            @Override
+                            public HashMap<String, Double> apply(
+                                    @NonNull HashMap<String, Double> inputMap,
+                                    @NonNull HashMap<String, Double> newValueMap) {
+                                double sum = inputMap.get("price")+newValueMap.get("price");
+                                double count = inputMap.get("pageCount")
+                                        +newValueMap.get("pageCount");
+                                double comicCount = inputMap.get("comicCount")
+                                        +newValueMap.get("comicCount");
+
+                                HashMap<String, Double> map = new HashMap<String, Double>();
+                                map.put("price", sum);
+                                map.put("pageCount", count);
+                                map.put("comicCount", comicCount);
+
+                                return map;
+                            }
+                        })
+                .takeWhile(new Predicate<HashMap<String, Double>>() {
+                    @Override
+                    public boolean test(@NonNull HashMap<String, Double> stringDoubleHashMap) throws Exception {
+                        return stringDoubleHashMap.get("price") < budget;
+                    }
+                })
+                .subscribe(new DisposableObserver<HashMap<String, Double>>() {
+                    @Override
+                    public void onNext(HashMap<String, Double> stringDoubleHashMap) {
+                        Timber.e("sum: %s pageCount: %s comicCount: %s", stringDoubleHashMap.get("price"), stringDoubleHashMap.get("pageCount"), stringDoubleHashMap.get("comicCount"));
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+
+        // example for learning scan() operator
+        /* Observable.fromIterable(getMarvelComicsList())
+                  .scan(0.0, new io.reactivex.functions.BiFunction<Double, MarvelComic, Double>() {
+                      @Override
+                      public Double apply(@NonNull Double aDouble, @NonNull MarvelComic marvelComic) throws Exception {
+                          double sum = aDouble+Double.valueOf(marvelComic.getPrice());
+                          Timber.e("scan() -> initialValue: %s   Sum: %s   marvelComic.getPrice() %s", aDouble, sum, marvelComic.getPrice());
+                          return sum;
+                      }
+                  })
+                .skip(1) // because scan() will return with the default value provided in the very first parameter of the scan()
+                  .takeWhile(new Predicate<Double>() {
+                      @Override
+                      public boolean test(@NonNull Double aDouble) throws Exception {
+                          Timber.e("takeWhile() -> value is %s", aDouble);
+                          return aDouble < budget;
+                      }
+                  })
+                  .subscribe(new DisposableObserver<Double>() {
+                      @Override
+                      public void onNext(Double aDouble) {
+                            Timber.e("onNext() -> value is: %s", aDouble);
+                      }
+
+                      @Override
+                      public void onError(Throwable e) {
+                          Timber.e("onError() -> error is: %s", e);
+                      }
+
+                      @Override
+                      public void onComplete() {
+                          Timber.e("onComplete()");
+                      }
+                  });*/
+
     }
 }
