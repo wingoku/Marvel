@@ -219,6 +219,8 @@ public class ComicListFragmentPresenter {
                         return filterData.getPrice() < budget;
                     }
                 })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableObserver<FilterComicsModel>() {
                     int count = 0;
                     int pageCount = 0;
