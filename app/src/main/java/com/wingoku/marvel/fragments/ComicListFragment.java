@@ -394,7 +394,7 @@ public class ComicListFragment extends Fragment {
 
     @Subscribe
     public void onComicListCreationFailure(OnMarvelComicListCreationFailureEvent event) {
-        Timber.e("onComicListCreationFailure: %s", event.getError());
+        Timber.e("onComicListCreationFailure: %s", (event.getError().isEmpty())?getString(R.string.string_no_data_found_on_server):event.getError());
     }
 
     @Subscribe

@@ -54,19 +54,14 @@ public class ComicListFragmentPresenter {
 
     private ComicsCacheDBController mComicsCacheDBController;
     private Retrofit mRetrofit;
-    private Picasso mPicasso;
-    private Context mContext;
-
     /**
      *
-     * @param context Context of activity or prefereably context of the application
      * @param retrofit instance of retrofit
      * @param picasso instance of picasso
      * @param comicsCacheDBController instance of comicsCacheDB
      */
     @Inject //This is called constructor injection
-    public ComicListFragmentPresenter (Context context, Retrofit retrofit, Picasso picasso, ComicsCacheDBController comicsCacheDBController) {
-        mContext = context;
+    public ComicListFragmentPresenter (Retrofit retrofit, Picasso picasso, ComicsCacheDBController comicsCacheDBController) {
         mRetrofit = retrofit;
         mPicasso = picasso;
         mComicsCacheDBController = comicsCacheDBController;
@@ -76,6 +71,8 @@ public class ComicListFragmentPresenter {
 
         mComicsCacheDBController.validateExpiryDateForDBEntry(Constants.MAX_STALE_DAYS);
     }
+
+    private Picasso mPicasso;
 
     /**
      *  Fetch Marvel Comics From Marvel Server
@@ -94,7 +91,7 @@ public class ComicListFragmentPresenter {
                     @Override
                     public void onNext(MarvelResponse response) {
                         if(response == null || response.getData() == null || response.getData().getResults() == null) {
-                            comicsFetchingFailure(mContext.getString(R.string.string_no_data_found_on_server));
+                            comicsFetchingFailure("");
                             return;
                         }
                         comicsFetchingSuccess(response.getData().getResults());
@@ -244,7 +241,6 @@ public class ComicListFragmentPresenter {
                         EventBus.getDefault().post(new OnComicsFilterTaskCompleteEvent(count, pageCount));
                     }
                 });
-
 
         mCompositeDisposable.add(filterDisposable);
     }
