@@ -1,5 +1,7 @@
 # Marvel Comics
 
+[![Build Status](https://travis-ci.org/wingoku/Marvel.svg?branch=master)](https://travis-ci.org/wingoku/Marvel)
+
 Java Docs: https://wingoku.github.io/marvelandroid/index.html
 
 More on Dagger2 Scoping: http://stackoverflow.com/a/30984952/1250107
