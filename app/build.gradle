@@ -51,6 +51,11 @@ android {
     configurations.all {
         resolutionStrategy.force 'com.android.support:support-annotations:'+versionNumber
     }
+
+    // reason for using this: TravisCi is causing build issues because of link misconfiguration in one of the dependencies of this app. WOrkaround: http://stackoverflow.com/a/24383860/1250107
+    lintOptions {
+        abortOnError false
+    }
 }
 
 dependencies {
@@ -63,7 +68,6 @@ dependencies {
 
     // Android support libaries
     compile 'com.android.support:appcompat-v7:'+versionNumber
-    compile 'com.android.support.constraint:constraint-layout:1.0.0-alpha9'
 
     compile 'com.android.support:cardview-v7:'+versionNumber
     compile 'com.android.support:design:'+versionNumber

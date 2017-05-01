@@ -1,5 +1,7 @@
 package com.wingoku.marvel;
 
+import android.support.annotation.NonNull;
+
 import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.subjects.PublishSubject;
@@ -31,11 +33,12 @@ public class RxBus {
      * @param type Type of the object that will be passed in {@link #postEvent(Object)}
      * @param observerAction observer that will subscribe to the subject
      */
-    public <T> void register(final Class<T> type, Action1<T> observerAction) {
-        mPublishSubject.filter(new Func1() {
+    @SuppressWarnings("unchecked")
+    public <T> void register(final Class<? super T> type, Action1<? super T> observerAction) {
+        mPublishSubject.filter(new Func1<T, Boolean>() {
             @Override
-            public Boolean call(Object o) {
-                Timber.e("Filter(): object type: %s typeClass is: %s", o.getClass(), type);
+            public Boolean call(T o){
+//                Timber.e("Filter(): object type: %s typeClass is: %s", o.getClass(), type.getName());
                 if(o.getClass().equals(type)) {
                     Timber.e("Filer() return true");
                     return true;
@@ -43,17 +46,17 @@ public class RxBus {
                 Timber.e("Filer() return false");
                 return false;
             }
-        }).map(new Func1() {
+        }).map(new Func1<T, T>() {
             @Override
-            public T call(Object o) {
-                Timber.e("Map(): object received from filter: %s", o);
-                return (T) o;
+            public T call(@NonNull T o) {
+//                Timber.e("Map(): object received from filter: %s", o);
+                return o;
             }
         }).subscribe(observerAction);
     }
 
     public <T> void postEvent(T object) {
-        Timber.e("onPostEvent: object is: %s", object);
+//        Timber.e("onPostEvent: object is: %s", object);
         mPublishSubject.onNext(object);
     }
 }
